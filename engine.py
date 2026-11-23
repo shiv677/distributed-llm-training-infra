@@ -122,7 +122,7 @@ class PipelineStage(nn.Module):
         self.stage_idx = stage_idx
         self.pp_size = pp_size
 
-        layers_per_stage = max(1, num_layers // pp_size)
+        layers_per_stage = num_layers // pp_size
         self.blocks = nn.ModuleList([
             TPBlock(model_dim, hidden_dim, tp_size)
             for _ in range(layers_per_stage)
@@ -310,6 +310,18 @@ class DistributedEngine:
             raise ValueError(
                 f"gradient_accumulation_steps ({self.config.gradient_accumulation_steps}) "
                 f"does not match batch_size / micro_batch_size ({computed_accum})"
+            )
+        if self.config.num_layers < self.config.pp_size or self.config.num_layers % self.config.pp_size != 0:
+            raise ValueError(
+                f"num_layers ({self.config.num_layers}) must be divisible by pp_size ({self.config.pp_size})"
+            )
+        if self.config.model_dim % self.config.tp_size != 0:
+            raise ValueError(
+                f"model_dim ({self.config.model_dim}) must be divisible by tp_size ({self.config.tp_size})"
+            )
+        if self.config.hidden_dim % self.config.tp_size != 0:
+            raise ValueError(
+                f"hidden_dim ({self.config.hidden_dim}) must be divisible by tp_size ({self.config.tp_size})"
             )
 
     def train_step(self, step: int, tokens: torch.Tensor, targets: torch.Tensor) -> StepMetrics:

@@ -101,12 +101,21 @@ def test_sharded_optimizer_memory_reduction():
 
 
 def test_config_validation():
-    """Ensure invalid batch and gradient accumulation configurations raise errors."""
+    """Ensure invalid batch, gradient accumulation, pipeline stage, and TP configurations raise errors."""
     with pytest.raises(ValueError, match="must be divisible"):
         DistributedEngine(TrainingConfig(batch_size=7, micro_batch_size=2, gradient_accumulation_steps=3))
 
     with pytest.raises(ValueError, match="does not match"):
         DistributedEngine(TrainingConfig(batch_size=8, micro_batch_size=2, gradient_accumulation_steps=2))
+
+    with pytest.raises(ValueError, match="num_layers .* must be divisible by pp_size"):
+        DistributedEngine(TrainingConfig(num_layers=5, pp_size=2))
+
+    with pytest.raises(ValueError, match="model_dim .* must be divisible by tp_size"):
+        DistributedEngine(TrainingConfig(model_dim=15, tp_size=2))
+
+    with pytest.raises(ValueError, match="hidden_dim .* must be divisible by tp_size"):
+        DistributedEngine(TrainingConfig(hidden_dim=15, tp_size=2))
 
 
 def test_distributed_training_loss_reduction():

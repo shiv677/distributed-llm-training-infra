@@ -102,6 +102,7 @@ def run_benchmark():
 
     total_start = time.perf_counter()
     crash_step = args.simulate_crash_at
+    last_loss = 0.0
 
     for step in range(1, args.steps + 1):
         if step == crash_step:

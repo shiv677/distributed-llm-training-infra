@@ -116,7 +116,7 @@ sequenceDiagram
 Run the command-line benchmark with default settings (includes automatic crash and recovery simulation):
 
 ```powershell
-python -m projects.distributed_llm_training_infra.main --steps 8 --simulate-crash-at 5
+python main.py --steps 8 --simulate-crash-at 5
 ```
 
 ### CLI Options
@@ -141,7 +141,7 @@ python -m projects.distributed_llm_training_infra.main --steps 8 --simulate-cras
 
 ## Test Specifications
 
-Pytest suite: `projects/distributed_llm_training_infra/test_engine.py` (9 tests, 100% passing):
+Pytest suite: `test_engine.py` (100% passing):
 
 1. `test_column_row_parallel_math_equivalence`: Verifies mathematical equivalence between TP column/row decomposition with All-Reduce and dense single-device Linear layers.
 2. `test_tp_dimension_validation`: Confirms `ValueError` is raised when feature dimensions are not divisible by `tp_size`.
@@ -155,5 +155,5 @@ Pytest suite: `projects/distributed_llm_training_infra/test_engine.py` (9 tests,
 
 Run tests:
 ```powershell
-pytest projects/distributed_llm_training_infra/test_engine.py -v
+pytest test_engine.py -v
 ```
